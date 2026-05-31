@@ -1,0 +1,75 @@
+name: Open Proxy Line Scanner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  proxy-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Fetch and Test Proxies
+        run: |
+          python -c '
+          import requests
+          import concurrent.futures
+
+          print("--- Dunya Genelindeki Aktif Kaynaklar Toplaniyor ---")
+          # Guvenilir acik proxy listeleri
+          urls = [
+              "https://githubusercontent.com",
+              "https://githubusercontent.com"
+          ]
+          
+          proxies = []
+          for url in urls:
+              try:
+                  res = requests.get(url, timeout=10)
+                  if res.status_code == 200:
+                      proxies.extend(res.text.strip().split("\n"))
+              except:
+                  continue
+
+          proxies = list(set([p.strip() for p in proxies if p.strip()]))[:200] # Ilk 200 adet test edilecek
+          print(f"{len(proxies)} adet benzersiz hat bulundu. Hiz testi basliyor...")
+
+          def test_proxy(proxy):
+              # SOCKS5 olarak test etmeyi dene
+              try:
+                  test_url = "http://httpbin.org"
+                  r = requests.get(test_url, proxies={"http": f"socks5://{proxy}", "https": f"socks5://{proxy}"}, timeout=3)
+                  if r.status_code == 200:
+                      return f"SOCKS5 -> {proxy}"
+              except:
+                  pass
+              # HTTP/S olarak test etmeyi dene
+              try:
+                  r = requests.get(test_url, proxies={"http": f"http://{proxy}", "https": f"http://{proxy}"}, timeout=3)
+                  if r.status_code == 200:
+                      return f"HTTP   -> {proxy}"
+              except:
+                  pass
+              return None
+
+          working = []
+          with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
+              results = executor.map(test_proxy, proxies)
+              for res in results:
+                  if res:
+                      working.append(res)
+
+          print("\n=== CALISAN EN HIZLI PROXY HATLARI ===")
+          if working:
+              for w in working[:15]:
+                  print(w)
+          else:
+              print("Su an aktif hat bulunamadi, lutfen daha sonra tekrar tetikleyin.")
+          '
+          
