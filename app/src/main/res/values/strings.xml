@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ProxyScanner</string>
+
+    <!-- Navigation -->
+    <string name="action_back">Back</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_results">Scan Results</string>
+    <string name="title_settings">Settings</string>
+
+    <!-- Home: about -->
+    <string name="home_tagline">Tests proxy configurations that you are authorized to use.</string>
+    <string name="home_phase_notice">Version 0.3 (Phase 3): import from a file or an https:// URL. No proxy engine is integrated, so nothing is connected or measured yet.</string>
+
+    <!-- Home: import -->
+    <string name="import_title">Import configurations</string>
+    <string name="import_button">Import Configurations</string>
+    <string name="import_hint">Choose a text file with one link per line (vless://, vmess://, ss://, trojan://). The file is read once and kept in memory only.</string>
+    <string name="import_empty">No configurations imported yet.</string>
+    <string name="import_in_progress">Importing…</string>
+    <string name="import_in_progress_file">Importing %1$s…</string>
+    <string name="import_status_title">Import status</string>
+    <string name="import_cancel">Cancel import</string>
+    <string name="import_cancelled">Import cancelled. Nothing was changed.</string>
+    <string name="import_success_title">Imported %1$s</string>
+    <string name="import_success_title_unnamed">Import finished</string>
+    <string name="import_failure_title">Import failed</string>
+    <string name="import_failure_file">Source: %1$s</string>
+    <string name="import_failure_kept">Previously loaded configurations were kept.</string>
+    <string name="import_stats">%1$d loaded · %2$d duplicates skipped · %3$d unsupported · %4$d invalid</string>
+    <string name="import_syntax_note">Loaded means the link has a valid format. It does not mean the proxy is online or working.</string>
+    <string name="import_issue_line">Line %1$d: %2$s</string>
+    <string name="import_issue_no_line">%1$s</string>
+    <string name="import_issues_more">…and %1$d more problems not listed.</string>
+    <string name="import_format_plain">Format: plain link list</string>
+    <string name="import_format_base64">Format: Base64 link list</string>
+
+    <!-- Home: URL -->
+    <string name="url_import_button">Import from URL</string>
+    <string name="url_title">Configuration URL</string>
+    <string name="url_label">https:// address</string>
+    <string name="url_hint">Address of a text list of links (vless://, vmess://, ss://, trojan://). https only.</string>
+    <string name="url_valid">The address looks valid. Nothing is downloaded until you tap Import from URL.</string>
+
+    <!-- Home: scan -->
+    <string name="scan_title">Scan</string>
+    <string name="scan_button">Start Scan</string>
+    <string name="scan_cancel">Cancel Scan</string>
+    <string name="scan_msg_no_configs">Import at least one valid configuration to enable scanning.</string>
+    <string name="scan_msg_engine">Scanning engine will be integrated in a later phase.</string>
+    <string name="scan_msg_probe">A test endpoint must be configured before scanning.</string>
+    <string name="scan_status_idle">Scan idle.</string>
+    <string name="scan_status_progress">Scanning… %1$d of %2$d finished</string>
+    <string name="scan_status_complete">Scan complete: %1$d tested.</string>
+    <string name="scan_status_cancelled">Scan cancelled. %1$d results were received before cancelling.</string>
+    <string name="scan_status_failed">Scan failed: %1$s</string>
+
+    <!-- Home: results summary -->
+    <string name="summary_title">Results</string>
+    <string name="summary_none">No results yet. Import configurations and run a scan.</string>
+    <string name="summary_loaded">%1$d configurations loaded. None have been tested.</string>
+    <string name="summary_loaded_scanned">%1$d configurations loaded.</string>
+    <string name="summary_counts">Working: %1$d · Limited: %2$d · Failed: %3$d · Unsupported: %4$d · Cancelled: %5$d</string>
+    <string name="summary_open">View Results</string>
+    <string name="protocol_count">%1$s: %2$d</string>
+
+    <!-- Results screen -->
+    <string name="results_empty_title">No scan results</string>
+    <string name="results_empty_body">No scan has produced results. This version cannot test proxies yet.</string>
+    <string name="results_configs_title">Imported configurations (not tested)</string>
+    <string name="results_not_tested">Not tested</string>
+    <string name="results_scan_title">Scan results</string>
+    <string name="results_status">Status: %1$s</string>
+    <string name="results_latency">Latency: %1$d ms</string>
+    <string name="results_failure">Reason: %1$s</string>
+    <string name="results_unknown_config">Configuration not in the current list</string>
+
+    <!-- Settings screen -->
+    <string name="settings_about_title">About</string>
+    <string name="settings_version">Version %1$s</string>
+    <string name="settings_version_unknown">Version unknown</string>
+    <string name="settings_engine_title">Scanning</string>
+    <string name="settings_engine">Protocol engine: %1$s</string>
+    <string name="settings_engine_none">None integrated</string>
+    <string name="settings_probe">Test endpoint: Not configured</string>
+    <string name="settings_import_title">Import limits</string>
+    <string name="settings_limit_size">Maximum file or download size: %1$d MiB</string>
+    <string name="settings_limit_entries">Maximum entries: %1$d</string>
+    <string name="settings_limit_line">Maximum line length: %1$d characters</string>
+    <string name="settings_schemes">Recognized link types: vless://, vmess://, ss://, trojan://. Recognition checks the format only.</string>
+    <string name="settings_privacy_title">Privacy</string>
+    <string name="settings_privacy_body">The only permission is INTERNET, used solely to download a configuration list from an https:// address you enter. Files are read through the system file picker. Imported configurations and URLs are not logged or saved, and nothing is sent anywhere else. No analytics or ads.</string>
+    <string name="settings_readonly">These values are read-only in this version.</string>
+</resources>

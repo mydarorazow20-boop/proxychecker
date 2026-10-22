@@ -1,0 +1,102 @@
+# Builds ProxyScanner on GitHub Actions: static checks, unit tests, assembleDebug.
+# Assumes the repository root is the project root (the folder that contains
+# settings.gradle.kts). Nothing here claims a proxy connects: no engine is
+# integrated yet (see PHASE-05-REPORT.md).
+name: Android build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      # Text/consistency checks only; they compile nothing. Run before the wrapper
+      # bootstrap so they see the repository exactly as committed.
+      - name: Static repository checks
+        run: |
+          python3 tools/verify_phase01.py
+          python3 tools/verify_phase04.py
+          python3 tools/verify_phase05.py
+
+      # AGP 8.7.x needs JDK 17; Gradle 8.9 runs on it.
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # The Gradle Wrapper JAR is a binary published by Gradle and is never written by
+      # hand. If it is not committed, generate it from the official distribution; the
+      # script checks the download against the SHA-256 published by Gradle AND the pin
+      # in the script, then runs `gradle wrapper`.
+      - name: Provide Gradle Wrapper (official bootstrap if the JAR is missing)
+        run: |
+          if [ -f gradle/wrapper/gradle-wrapper.jar ]; then
+            echo "gradle-wrapper.jar is committed; it is validated by setup-gradle below."
+          else
+            echo "gradle-wrapper.jar is missing; bootstrapping from the official Gradle distribution."
+            sh tools/bootstrap-wrapper.sh
+          fi
+          chmod +x gradlew
+
+      # Validates the checksum of every gradle-wrapper.jar in the repository,
+      # and caches ~/.gradle.
+      - name: Set up Gradle (wrapper validation and cache)
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install SDK platform 35
+        run: sdkmanager --install "platforms;android-35"
+
+      - name: Unit tests
+        id: tests
+        run: ./gradlew --no-daemon --stacktrace :app:testDebugUnitTest
+
+      - name: Assemble debug APK
+        id: assemble
+        run: ./gradlew --no-daemon --stacktrace :app:assembleDebug
+
+      # Runs only if every previous step succeeded; fails if no APK exists.
+      - name: Upload debug APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: proxyscanner-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
+      - name: Upload unit test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-reports
+          path: |
+            app/build/reports/tests/
+            app/build/test-results/
+          if-no-files-found: ignore
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## ProxyScanner build"
+            echo "- Unit tests: ${{ steps.tests.outcome || 'not reached' }}"
+            echo "- assembleDebug: ${{ steps.assemble.outcome || 'not reached' }}"
+            echo "- Engine: none integrated; no proxy connection is tested by this workflow."
+          } >> "$GITHUB_STEP_SUMMARY"
